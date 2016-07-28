@@ -7,7 +7,6 @@
         <label class="col-lg-2 control-label">Username</label>
         <div class="col-lg-5">
             <input type="text" name="name" class="form-control" value="<?php echo $karyawan['username'];?>" readonly="readonly">
-            <input type="text" name="name" class="form-control" value="<?php echo $karyawan['username'];?>" readonly="readonly">
         </div>
     </div>
     <div class="form-group">

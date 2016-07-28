@@ -2,7 +2,7 @@
     
     function __construct(){
         parent::__construct();
-        $this->load->library(array('template'));
+        $this->load->library(array('template', 'form_validation'));
         $this->load->model(array('attendance_model','user_model'));
         
         if(!$this->session->userdata('username')){
@@ -12,12 +12,32 @@
      
     function presensi(){
         $data['title']="Data Laporan Presensi";
-        $cek=$this->attendance_model->get_attendance_report();
-        echo $cek->row();
+        // $cek=$this->attendance_model->get_attendance_report();
+        // echo $cek->row();
         /*$data['message']="";
         $data['presensi']=$cek->result();
-        $this->template->display('laporan/presensi',$data);
         */
+        if ($this->input->server('REQUEST_METHOD') == 'POST') {
+            $data['presensi'] = $this->attendance_model->get_all("ATTENDANCE_IN_DATE like '".$this->input->post('cari')."'")->result();
+            
+            $this->template->display('laporan/presensi',$data);
+        } else {
+            $data['presensi'] = $this->attendance_model->get_all("ATTENDANCE_IN_DATE like '".date('Y-m-d')."'")->result();
+            $this->template->display('laporan/presensi',$data);
+        }
+    }
+
+    public function presensi_edit($username)
+    {
+        $data['title']="Data Laporan Presensi";
+        $data['message'] = '';
+        $this->form_validation->set_rules('status', 'Status', 'required');
+        if ($this->form_validation->run() == true) {
+            # code...
+        } else {
+            $data['presensi'] = $this->attendance_model->get_by_id(array('USERNAME' => $username));
+            $this->template->display('laporan/presensi_edit',$data);
+        }
     }
 
     public function data_gaji()
