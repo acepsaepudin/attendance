@@ -147,6 +147,25 @@ class User_model extends CI_Model
      		return null;
    		}
 	}
+
+	function get_by_id($condition)
+    {
+        $res = $this->db->get_where('user', $condition);
+        if ($res->num_rows() > 0) {
+            $result = $res->row();
+        } else {
+            $result = '';
+        }
+        return $result;
+    }
+
+    function get_all($condition=null)
+    {
+        if (isset($condition)) {
+            $this->db->where($condition);
+        }
+        return $this->db->get('user');
+    }
 }
 
 ?>

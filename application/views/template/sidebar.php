@@ -6,7 +6,7 @@
                                         </span> Master Data</a>
                                     </h4>
                                 </div>
-                                <div id="collapseOne" class="panel-collapse collapse in">
+                                <div id="collapseOne" class="panel-collapse collapse">
                                     <div class="panel-body">
                                         <table class="table">
                                             <tr>
@@ -36,6 +36,11 @@
                                 <tr>
                                     <td>
                                         <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('laporan/presensi');?>"> Data Presensi</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('laporan/data_gaji');?>"> Data Gaji</a>
                                     </td>
                                 </tr>
                                 <!--<tr>

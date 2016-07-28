@@ -128,6 +128,25 @@ class Attendance_model extends CI_Model
      		return FALSE;
    		}
  	}
+
+ 	function get_by_id($condition)
+    {
+        $res = $this->db->get_where('attendance', $condition);
+        if ($res->num_rows() > 0) {
+            $result = $res->row();
+        } else {
+            $result = '';
+        }
+        return $result;
+    }
+
+    function get_all($condition=null)
+    {
+        if (isset($condition)) {
+            $this->db->where($condition);
+        }
+        return $this->db->get('attendance');
+    }
 	 		
 }
 
