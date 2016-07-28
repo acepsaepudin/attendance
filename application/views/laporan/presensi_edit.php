@@ -22,6 +22,6 @@
     </div>
     <div class="form-group well">
         <button class="btn btn-primary"><i class="glyphicon glyphicon-hdd"></i> Update</button>
-        <a href="<?php echo site_url('karyawan');?>" class="btn btn-default">Kembali</a>
+        <a href="<?php echo site_url('laporan/presensi');?>" class="btn btn-default">Kembali</a>
     </div>
 </form>
