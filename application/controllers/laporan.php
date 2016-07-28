@@ -71,7 +71,7 @@
             $user_data = $month_attendance[$value->USERNAME];
             if ($user_data) {
                 foreach ($user_data as $k => $v) {
-                    $month_salary += $v->total_hours*10000;
+                    $month_salary += $v->total_hours*18750;
                 }
                 $month_attendance[$value->USERNAME]['month_salary'] = $month_salary;
                 $month_salary = 0;
