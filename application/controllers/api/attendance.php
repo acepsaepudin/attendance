@@ -41,20 +41,22 @@ class Attendance extends REST_Controller
 	
 	function pulang_post()
     {
+    	date_default_timezone_set("Asia/Jakarta");
     	//cek jam masuk , ganti jam max_hours sesuai selera
-		$max_hours = DateTime::createFromFormat('H:i', '16:00');
+		$max_hours = DateTime::createFromFormat('H:i', '05:58');
+		
 		$input = DateTime::createFromFormat('H:i', date('H:i'));
 		$a = $max_hours->diff($input);
-		
-		if (($a->invert == 1) && ($a->h == 0)) {
+		// exit;
+		if (($a->invert == 1)) {
 			// die('jangan pulang');
 			$this->response(array('success' => false, 'message' => 'Belum Boleh Pulang.', 'responseCode' => 406), 406);
-		} else {
+		}else {
 			//check jika user alfa/gak masuk
 			$check = $this->attendance_model->get_attendance_current_user(post('attendance_id'));
 
-			if ($check) {
 				// die('boleh pulang');
+			if ($check) {
 				$model = $this->attendance_model->update_pulang(post('attendance_id'), post('latitude'), post('longitude'));
 				if(empty($model)){
 					$this->response(array('success' => false, 'message' => 'Upadate Failed', 'responseCode' => 406), 406);
