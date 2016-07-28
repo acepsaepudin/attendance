@@ -2,10 +2,11 @@
 <?php echo validation_errors();?>
 <?php echo $message;?>
 
-<form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
+<form class="form-horizontal" action="<?php echo site_url('karyawan/edit/'.$karyawan['username']);?>" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label class="col-lg-2 control-label">Username</label>
         <div class="col-lg-5">
+            <input type="text" name="name" class="form-control" value="<?php echo $karyawan['username'];?>" readonly="readonly">
             <input type="text" name="name" class="form-control" value="<?php echo $karyawan['username'];?>" readonly="readonly">
         </div>
     </div>
@@ -39,8 +40,8 @@
         <label class="col-lg-2 control-label">Status</label>
         <div class="col-lg-5">
             <select name="status" class="form-control">
-                <option value="<?php echo $karyawan['status'];?>">Aktif</option>
-				<option value="<?php echo $karyawan['status'];?>">Non-Aktif</option>				
+                <option value="aktif" <?php echo ($karyawan['status'] == 'aktif') ? 'selected' : '';?>>Aktif</option>
+                <option value="non-aktif" <?php echo ($karyawan['status'] == 'non-aktif') ? 'selected' : '';?>>Non-Aktif</option>
             </select>
         </div>
     </div>

@@ -41,18 +41,25 @@ class Karyawan extends CI_Controller{
     
     function edit($id){
         $data['title']="Edit Data Karyawan";
-        $this->_set_rules();
+        // $this->_set_rules();
+        $this->form_validation->set_rules('nama','Nama','required|max_length[50]');
+        $this->form_validation->set_rules('jk','Jenis Kelamin','required|max_length[2]');
+        $this->form_validation->set_rules('ttl','Tanggal Lahir','required');
+        $this->form_validation->set_rules('alamat','Alamat','required');
+        // $this->form_validation->set_rules('status','Status','required|max_length[10]');
+        $this->form_validation->set_error_delimiters("<div class='alert alert-danger'>","</div>");
         if($this->form_validation->run()==true){
-            $nis=$this->input->post('nis');
+            // $nis=$this->input->post('nis');
+            $nis=$id;
             
             $info=array(
-                'nama'=>$this->input->post('nama'),
-                'kelas'=>$this->input->post('kelas'),
-                'ttl'=>$this->input->post('ttl'),
-                'jk'=>$this->input->post('jk'),
-				'kelas'=>$this->input->post('alamat'),
-				'status'=>$this->input->post('status'),
-                'image'=>$gambar
+                'FULL_NAME'=>$this->input->post('nama'),
+                // 'kelas'=>$this->input->post('kelas'),
+                'BIRTHDATE'=>$this->input->post('ttl'),
+                'GENDER'=>$this->input->post('jk'),
+				'ADDRESS'=>$this->input->post('alamat'),
+				'STATUS'=>$this->input->post('status'),
+                // 'image'=>$gambar
             );
             //update data angggota
             $this->user_model->updatekar($nis,$info);
@@ -64,6 +71,7 @@ class Karyawan extends CI_Controller{
             $data['karyawan']=$this->user_model->cek_karyawan($id)->row_array();
             $this->template->display('karyawan/edit',$data);
         }else{
+            
             $data['karyawan']=$this->user_model->cek_karyawan($id)->row_array();
             $data['message']="";
             $this->template->display('karyawan/edit',$data);
