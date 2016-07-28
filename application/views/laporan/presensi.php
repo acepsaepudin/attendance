@@ -13,8 +13,8 @@
     <thead>
         <tr>
             <td>No.</td>
-            <td>Tanggal</td>
             <td>Nama</td>
+            <td>Tanggal</td>
             <td>Jam Masuk</td>
             <td>Jam Pulang</td>
             <td>Action</td>
@@ -26,7 +26,7 @@
         <td><?php echo $value->USERNAME;?></td>
         <td><?php echo $value->ATTENDANCE_IN_DATE;?></td>
         <td><?php echo $value->ATTENDANCE_IN_TIME;?></td>
-        <td><?php echo $value->ATTENDANCE_OUT_DATE;?></td>
+        <td><?php echo $value->ATTENDANCE_OUT_TIME;?></td>
         <td><a href="<?php echo site_url('laporan/presensi_edit/'.$value->USERNAME);?>"><i class="glyphicon glyphicon-edit"></i></a></td>
     </tr>
     <?php endforeach;?>
