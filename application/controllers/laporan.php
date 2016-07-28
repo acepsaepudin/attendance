@@ -48,6 +48,7 @@
         //ambil data user aktif
         $data_user = $this->user_model->get_all(array('status' => 'aktif'));
         $data_user = $data_user->result();
+        // $now = date('Y-m');
         foreach ($data_user as $key => $value) {
             //get data attendance one month
             $res_data = $this->attendance_model->get_all("USERNAME = '".$value->USERNAME."' and ATTENDANCE_IN_DATE like '2016-06-%'")->result();
@@ -59,6 +60,7 @@
         foreach ($month_attendance as $key => $value) {
             foreach ($value as $k => $v) {
                 // total sehari kerja
+                //ceil
                 $value[$k]->total_hours = floor($this->get_working_hours($v->ATTENDANCE_IN_DATE.' '.$v->ATTENDANCE_IN_TIME,$v->ATTENDANCE_OUT_DATE.' '.$v->ATTENDANCE_OUT_TIME));
 
             }

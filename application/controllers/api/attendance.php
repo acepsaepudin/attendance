@@ -14,14 +14,14 @@ class Attendance extends REST_Controller
     {
 		$model = $this->attendance_model->get_date();
 		if(empty($model)){
-			//cek jam masuk
-			$max_hours = DateTime::createFromFormat('H:i', '08:30');
+			//cek jam masuk ganti kalau mau testing
+			$max_hours = DateTime::createFromFormat('H:i', '21:30');
 			$input = DateTime::createFromFormat('H:i', date('H:i'));
 			$a = $max_hours->diff($input);
 
 			if (($a->invert == 0) && ($a->h == 0) && ($a->i > 30)) {
 				// die("lebih dari 8 30");
-				$this->response(array('success' => false, 'message' => 'Anda Terlambat Lebih Dari 30 Menit.', 'responseCode' => 406), 406);
+				$this->response(array('success' => false, 'message' => 'Anda Terlambat Lebih Dari 15 Menit.', 'responseCode' => 406), 406);
 			} else {
 				// die('Kurang dari 8 30');
 				$model = $this->attendance_model->insert_masuk(post('username'), post('latitude'), post('longitude'));
@@ -41,7 +41,7 @@ class Attendance extends REST_Controller
 	
 	function pulang_post()
     {
-    	//cek jam masuk
+    	//cek jam masuk , ganti jam max_hours sesuai selera
 		$max_hours = DateTime::createFromFormat('H:i', '16:00');
 		$input = DateTime::createFromFormat('H:i', date('H:i'));
 		$a = $max_hours->diff($input);

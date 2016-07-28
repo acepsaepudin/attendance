@@ -14,6 +14,7 @@
         <tr>
             <td>No.</td>
             <td>Tanggal</td>
+            <td>Nama</td>
             <td>Jam Masuk</td>
             <td>Jam Pulang</td>
             <td>Action</td>
@@ -22,6 +23,7 @@
     <?php $no=0; foreach($presensi as $key => $value): $no++;?>
     <tr>
         <td><?php echo $no;?></td>
+        <td><?php echo $value->USERNAME;?></td>
         <td><?php echo $value->ATTENDANCE_IN_DATE;?></td>
         <td><?php echo $value->ATTENDANCE_IN_TIME;?></td>
         <td><?php echo $value->ATTENDANCE_OUT_DATE;?></td>

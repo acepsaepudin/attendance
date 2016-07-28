@@ -6,11 +6,11 @@ class Attendance_model extends CI_Model
  	{
  		$this->db->select('attendance_id, attendance_in_date');
    		$this->db->from('attendance');
-		$this->db->where("attendance_in_date =  '". date('Y/m/d') . "'");
+		$this->db->where("attendance_in_date =  '". date('Y-m-d') . "'");
 		
    		$query = $this->db->get();
 
-   		if($query -> num_rows() == 1)
+   		if($query -> num_rows() > 0)
    		{
      		return $query->row();
    		}
@@ -77,11 +77,11 @@ class Attendance_model extends CI_Model
  	{
  		$this->db->select('attendance_in_date, attendance_in_time, attendance_out_time');
    		$this->db->from('attendance');
-		$this->db->where("attendance_in_date =  '". date('Y/m/d') . "'");
+		$this->db->where("attendance_in_date =  '". date('Y-m-d') . "'");
 		
    		$query = $this->db->get();
 
-   		if($query -> num_rows() == 1)
+   		if($query -> num_rows() > 0)
    		{
      		return $query->row();
    		}
