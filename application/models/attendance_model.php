@@ -58,6 +58,23 @@ class Attendance_model extends CI_Model
 		$result = $this->db->insert('attendance', $data);
 		return $result;
 	}
+
+  function save($data)
+  {
+      $this->db->insert('attendance', $data);
+      return $this->db->insert_id();
+  }
+
+  function update($data, $condition=NULL)
+  {
+      if(isset($condition))
+      {
+          $this->db->where($condition);
+      }
+      
+      return $this->db->set($data)
+          ->update('attendance');
+  } 
 	
 	public function update_pulang($id, $latitude, $longitude)
 	{

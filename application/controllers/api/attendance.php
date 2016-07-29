@@ -12,30 +12,60 @@ class Attendance extends REST_Controller
 	
 	function masuk_post()
     {
+    	date_default_timezone_set("Asia/Jakarta");
 		$model = $this->attendance_model->get_date();
 		if(empty($model)){
 			//cek jam masuk ganti kalau mau testing
-			$max_hours = DateTime::createFromFormat('H:i', '21:30');
+			$max_hours = DateTime::createFromFormat('H:i','08:00');
+
 			$input = DateTime::createFromFormat('H:i', date('H:i'));
 			$a = $max_hours->diff($input);
 
 			if (($a->invert == 0) && ($a->h == 0) && ($a->i > 30)) {
 				// die("lebih dari 8 30");
 				$this->response(array('success' => false, 'message' => 'Anda Terlambat Lebih Dari 15 Menit.', 'responseCode' => 406), 406);
-			} else {
-				// die('Kurang dari 8 30');
-				$model = $this->attendance_model->insert_masuk(post('username'), post('latitude'), post('longitude'));
-				if(empty($model)){
-					$this->response(array('success' => false, 'message' => 'Insert Failed', 'responseCode' => 406), 406);
-				} else {
-					$this->response(array('success' => true, 'message' => 'Insert Successfull', 'responseCode' => 200), 200);
-				}	
+			} 
+			if (($a->invert == 0) && ($a->h == 0) && ($a->i < 30)) {
+				// die('telat dipotong 4 jam');
+				$epoch = new DateTime(date('Y/m/d H:i:s'));	
+				//ganti jam masuk start dari jam 12
+				$masuk = DateTime::createFromFormat('H:i','12:00');
+				$absen = array(
+					'username' => post('username'),
+					'office_id' => '1',
+					'attendance_id' => $epoch->format('U'),
+					'attendance_in_date' => $masuk->format('Y-m-d'),
+					'attendance_in_time' => $masuk->format('H:i:s'),
+					'attendance_out_date' => '',
+					'attendance_out_time' => '',
+					'latitude_in' => post('latitude'),
+					'longitude_in' => post('longitude')			
+				);
+				$this->attendance_model->save($absen);
+
+				$this->response(array('success' => true, 'message' => 'Presensi Masuk Berhasil', 'responseCode' => 200), 200);
 			}
-			
-			exit;
+			else {
+				//dianggap masuk jam 8 untuk perhitungan gaji
+				$epoch = new DateTime(date('Y/m/d H:i:s'));
+				$masuk = DateTime::createFromFormat('H:i','08:00');
+				$absen = array(
+					'username' => post('username'),
+					'office_id' => '1',
+					'attendance_id' => $epoch->format('U'),
+					'attendance_in_date' => $masuk->format('Y-m-d'),
+					'attendance_in_time' => $masuk->format('H:i:s'),
+					'attendance_out_date' => '',
+					'attendance_out_time' => '',
+					'latitude_in' => post('latitude'),
+					'longitude_in' => post('longitude')			
+				);
+				$this->attendance_model->save($absen);
+				$this->response(array('success' => true, 'message' => 'Presensi Masuk Berhasil', 'responseCode' => 200), 200);
+			}
 
 		} else {
-			$this->response(array('success' => true, 'message' => 'Sudah Melakukan Absensi Sebelumnya', 'responseCode' => 406), 406);
+			$this->response(array('success' => true, 'message' => 'Sudah Melakukan Presensi Masuk Sebelumnya', 'responseCode' => 406), 406);
 		}		
     }
 	
@@ -43,25 +73,53 @@ class Attendance extends REST_Controller
     {
     	date_default_timezone_set("Asia/Jakarta");
     	//cek jam masuk , ganti jam max_hours sesuai selera
-		$max_hours = DateTime::createFromFormat('H:i', '05:58');
+		$max_hours = DateTime::createFromFormat('H:i','16:00');
 		
 		$input = DateTime::createFromFormat('H:i', date('H:i'));
 		$a = $max_hours->diff($input);
-		// exit;
+
 		if (($a->invert == 1)) {
-			// die('jangan pulang');
-			$this->response(array('success' => false, 'message' => 'Belum Boleh Pulang.', 'responseCode' => 406), 406);
+			die('jangan pulang');
+			$this->response(array('success' => false, 'message' => 'Anda Belum Diperbolehkan Pulang.', 'responseCode' => 406), 406);
 		}else {
 			//check jika user alfa/gak masuk
 			$check = $this->attendance_model->get_attendance_current_user(post('attendance_id'));
 
 				// die('boleh pulang');
 			if ($check) {
-				$model = $this->attendance_model->update_pulang(post('attendance_id'), post('latitude'), post('longitude'));
-				if(empty($model)){
-					$this->response(array('success' => false, 'message' => 'Upadate Failed', 'responseCode' => 406), 406);
+				$pernah_absen = $this->attendance_model->get_by_id(array('attendance_id' => post('attendance_id')));
+
+				//check apakah user pernah keluar absen
+				if ($pernah_absen->ATTENDANCE_OUT_DATE == '0000-00-00') {
+
+					//set maksimal jam lembur
+					$max_pulang = DateTime::createFromFormat('H:i','21:00');
+					$input_pulang = DateTime::createFromFormat('H:i', date('H:i'));
+					$max_db_input = DateTime::createFromFormat('H:i','21:00');
+					$b = $max_pulang->diff($input_pulang);
+
+					//inputan dibawah jam 9 malam
+					if ($b->invert == 1) {
+						$absen = array(
+							'attendance_out_date' => $input_pulang->format('Y-m-d'),
+							'attendance_out_time' => $input_pulang->format('H:i:s'),
+							'latitude_in' => post('latitude'),
+							'longitude_in' => post('longitude')	
+						);
+					} else {
+						//inputan diatas jam 9 malam,jadi input dipaksa lembur hanya sampai jam 9 malam saja.
+						$absen = array(
+							'attendance_out_date' => $max_db_input->format('Y-m-d'),
+							'attendance_out_time' => $max_db_input->format('H:i:s'),
+							'latitude_in' => post('latitude'),
+							'longitude_in' => post('longitude')	
+						);
+					}
+					$this->attendance_model->update($absen, array('attendance_id' => post('attendance_id')));
+					$this->response(array('success' => true, 'message' => 'Presensi Pulang Berhasil', 'responseCode' => 200), 200);
 				} else {
-					$this->response(array('success' => true, 'message' => 'Update Successfull', 'responseCode' => 200), 200);
+					//sudah pernah klik absen pulang
+					$this->response(array('success' => false, 'message' => 'Anda Sudah Melakukan Absen Pulang', 'responseCode' => 406), 406);
 				}
 			} else {
 				$this->response(array('success' => false, 'message' => 'Anda Absen Hari ini', 'responseCode' => 406), 406);
