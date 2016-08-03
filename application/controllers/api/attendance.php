@@ -15,7 +15,7 @@ class Attendance extends REST_Controller
 		$model = $this->attendance_model->get_date();
 		if(empty($model)){
 			//cek jam masuk ganti kalau mau testing
-			$max_hours = DateTime::createFromFormat('H:i', '21:30');
+			$max_hours = DateTime::createFromFormat('H:i', '06:00');
 			$input = DateTime::createFromFormat('H:i', date('H:i'));
 			$a = $max_hours->diff($input);
 

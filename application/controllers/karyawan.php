@@ -154,4 +154,65 @@ class Karyawan extends CI_Controller{
 		$this->form_validation->set_rules('status','Status','required|max_length[10]');
         $this->form_validation->set_error_delimiters("<div class='alert alert-danger'>","</div>");
     }
+
+    public function gaji_pokok()
+    {
+        $data['message'] = '';
+        $data['title']="Gaji Pokok";
+        $data['karyawan'] = $this->user_model->get_all()->result();
+        
+        $this->template->display('karyawan/gaji_pokok',$data);
+    }
+
+    function cari_gaji_pokok(){
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            
+            $data['title']="Pencarian";
+            $cari=$this->input->post('cari');
+            $cek=$this->user_model->cari_karyawan($cari);
+            
+            if($cek->num_rows()>0){
+                $data['message']="";
+                $data['karyawan']=$cek->result();
+
+                
+                $this->template->display('karyawan/gaji_pokok',$data);
+            }else{
+                $data['message']="<div class='alert alert-success'>Data tidak ditemukan</div>";
+                $data['karyawan']=$cek->result();
+                $this->template->display('karyawan/gaji_pokok',$data);
+            }
+        } else {
+            redirect('karyawan/gaji_pokok');
+        }
+    }
+
+    public function update_gaji_pokok($username)
+    {
+        $this->load->model('salary_model');
+        $data['title']="Gaji Pokok";
+        $this->form_validation->set_rules('gapok', 'Gaji Pokok', 'required|is_natural');
+        $data['salary'] = $this->salary_model->get_by_id(['USERNAME' => $username]);
+        $data['karyawan'] = $this->user_model->get_by_id(['USERNAME' => $username]);
+        
+        if ($this->form_validation->run() == false) {
+            $data['message']="";
+            // $data['karyawan']=$cek->result();
+            $this->template->display('karyawan/gaji_pokok_form',$data);
+        } else {
+            $get_data = $this->salary_model->get_by_id(['USERNAME' => $username]);
+
+            if ($get_data) {
+                $this->salary_model->update(['USER_SALARY' => $this->input->post('gapok')], ['USERNAME' => $username]);
+                // redirect('karyawan/update_gaji_pokok/'.$username);
+                // $this->template->display('karyawan/gaji_pokok_form',$data);
+            } else {
+                $this->salary_model->save(['USERNAME' => $username, 'USER_SALARY' => $this->input->post('gapok')]);
+            }
+            // $data['message']="<div class='alert alert-success'>Berhasil Mengubah Gaji Pokok.</div>";
+            $this->session->set_flashdata('sukses',"<div class='alert alert-success'>Berhasil Mengubah Gaji Pokok.</div>");
+            redirect('karyawan/update_gaji_pokok/'.$username);
+            // $this->template->display('karyawan/gaji_pokok_form',$data);
+        }
+    }
 }

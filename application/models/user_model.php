@@ -56,9 +56,9 @@ class User_model extends CI_Model
     }
 	
 	function cari_karyawan($cari){
-        $this->db->select('username, full_name, gender, birthdate, address');
-		$this->db->where("user_role_id", "2");   
-		$this->db->like("full_name",$cari);
+        $this->db->select('*');
+		$this->db->where("USER_ROLE_ID", "2");   
+		$this->db->like("FULL_NAME",$cari);
         return $this->db->get("user");
     }
 	
