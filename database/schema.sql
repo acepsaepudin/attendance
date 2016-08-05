@@ -4,3 +4,9 @@ create table salary(
 	USERNAME varchar(20),
 	primary key (id)
 );
+
+create table late(
+	ID int(11) not null auto_increment,
+	LATE_VALUE int(100),
+	primary key(id)
+);

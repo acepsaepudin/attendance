@@ -17,6 +17,7 @@
             <td>Tanggal</td>
             <td>Jam Masuk</td>
             <td>Jam Pulang</td>
+            <td>Status</td>
             <td>Action</td>
         </tr>
     </thead>
@@ -27,6 +28,7 @@
         <td><?php echo $value->ATTENDANCE_IN_DATE;?></td>
         <td><?php echo $value->ATTENDANCE_IN_TIME;?></td>
         <td><?php echo $value->ATTENDANCE_OUT_TIME;?></td>
+        <td><?php echo $value->STATUS;?></td>
         <td><a href="<?php echo site_url('laporan/presensi_edit/'.$value->USERNAME);?>"><i class="glyphicon glyphicon-edit"></i></a></td>
     </tr>
     <?php endforeach;?>

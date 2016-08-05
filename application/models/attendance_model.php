@@ -6,7 +6,8 @@ class Attendance_model extends CI_Model
  	{
  		$this->db->select('attendance_id, attendance_in_date');
    		$this->db->from('attendance');
-		$this->db->where("attendance_in_date =  '". date('Y-m-d') . "'");
+      $this->db->where('username',post('username'));
+    $this->db->where("attendance_in_date =  '". date('Y-m-d') . "'");
 		
    		$query = $this->db->get();
 

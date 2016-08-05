@@ -22,10 +22,23 @@ class Attendance extends REST_Controller
 			$a = $max_hours->diff($input);
 
 			if (($a->invert == 0) && ($a->h == 0) && ($a->i > 30)) {
+				$absen = array(
+					'username' => post('username'),
+					'office_id' => '1',
+					'attendance_id' => date('U'),
+					'attendance_in_date' => date('Y-m-d'),
+					'attendance_in_time' => '',
+					'attendance_out_date' => '',
+					'attendance_out_time' => '',
+					'latitude_in' => post('latitude'),
+					'longitude_in' => post('longitude'),
+					'status' => 'absen'			
+				);
+				$this->attendance_model->save($absen);
 				// die("lebih dari 8 30");
-				$this->response(array('success' => false, 'message' => 'Anda Terlambat Lebih Dari 15 Menit.', 'responseCode' => 406), 406);
-			} 
-			if (($a->invert == 0) && ($a->h == 0) && ($a->i < 30)) {
+				$this->response(array('success' => true, 'message' => 'Anda Sudah Tidak Diperbolehkan Presensi Masuk.', 'responseCode' => 200), 200);
+			}
+			if (($a->invert == 0) && ($a->h == 0) && ($a->i > 15)) {
 				// die('telat dipotong 4 jam');
 				$epoch = new DateTime(date('Y/m/d H:i:s'));	
 				//ganti jam masuk start dari jam 12
@@ -39,11 +52,12 @@ class Attendance extends REST_Controller
 					'attendance_out_date' => '',
 					'attendance_out_time' => '',
 					'latitude_in' => post('latitude'),
-					'longitude_in' => post('longitude')			
+					'longitude_in' => post('longitude'),
+					'status' => 'terlambat'			
 				);
 				$this->attendance_model->save($absen);
 
-				$this->response(array('success' => true, 'message' => 'Presensi Masuk Berhasil', 'responseCode' => 200), 200);
+				$this->response(array('success' => true, 'message' => 'Anda Terlambat', 'responseCode' => 200), 200);
 			}
 			else {
 				//dianggap masuk jam 8 untuk perhitungan gaji
@@ -58,7 +72,8 @@ class Attendance extends REST_Controller
 					'attendance_out_date' => '',
 					'attendance_out_time' => '',
 					'latitude_in' => post('latitude'),
-					'longitude_in' => post('longitude')			
+					'longitude_in' => post('longitude'),
+					'status' => 'hadir'			
 				);
 				$this->attendance_model->save($absen);
 				$this->response(array('success' => true, 'message' => 'Presensi Masuk Berhasil', 'responseCode' => 200), 200);
@@ -79,7 +94,7 @@ class Attendance extends REST_Controller
 		$a = $max_hours->diff($input);
 
 		if (($a->invert == 1)) {
-			die('jangan pulang');
+			// die('jangan pulang');
 			$this->response(array('success' => false, 'message' => 'Anda Belum Diperbolehkan Pulang.', 'responseCode' => 406), 406);
 		}else {
 			//check jika user alfa/gak masuk

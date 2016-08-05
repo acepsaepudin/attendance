@@ -215,4 +215,43 @@ class Karyawan extends CI_Controller{
             // $this->template->display('karyawan/gaji_pokok_form',$data);
         }
     }
+
+    // public function potongan_terlambat()
+    // {
+    //     $data['message'] = '';
+    //     $data['title']="Gaji Pokok";
+    //     $data['karyawan'] = $this->user_model->get_all()->result();
+        
+    //     $this->template->display('karyawan/terlambat',$data);
+    // }
+
+    public function potongan_terlambat()
+    {
+        $this->load->model('late_model');
+        $data['title']="Update Terlambat";
+        $this->form_validation->set_rules('late', 'Potongan Terlambat', 'required|is_natural');
+        
+        
+        if ($this->form_validation->run() == false) {
+            $data['message']="";
+            // $data['karyawan']=$cek->result();
+            $data['late'] = $this->late_model->get_all()->row();
+            $this->template->display('karyawan/terlambat_form',$data);
+        } else {
+            $get_data = $this->late_model->get_all();
+            
+            if ($get_data->num_rows() > 0) {
+                $this->late_model->update([
+                        'LATE_VALUE' => $this->input->post('late')
+                    ],[
+                        'ID' => $get_data->row()->ID
+                    ]);
+            } else {
+                $this->late_model->save(['LATE_VALUE' => $this->input->post('late')]);
+            }
+                $this->session->set_flashdata('sukses',"<div class='alert alert-success'>Berhasil Mengubah Potongan Terlambat.</div>");
+                redirect('karyawan/potongan_terlambat');
+            // $this->template->display('karyawan/gaji_pokok_form',$data);
+        }
+    }
 }

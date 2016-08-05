@@ -40,14 +40,14 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('laporan/data_gaji');?>"> Potongan Telat</a>
+                                        <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('karyawan/potongan_terlambat');?>"> Potongan Telat</a>
                                     </td>
                                 </tr>
-                                <tr>
+                                <!-- <tr>
                                     <td>
                                         <span class="glyphicon glyphicon-list-alt"></span><a href="<?php echo site_url('laporan/karyawan');?>"> Lembur</a>
                                     </td>
-                                </tr>
+                                </tr> -->
                             </table>
                         </div>
                     </div>

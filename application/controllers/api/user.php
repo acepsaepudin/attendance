@@ -12,7 +12,7 @@ class User extends REST_Controller
 		
 	function login_post()
 	{
-		$username = $this->post('useraname');
+		$username = $this->post('nik');
 		$password = $this->post('password');
 		if(!empty($username) || !empty($password)){
 			$model = $this->user_model->login($username, $password);
