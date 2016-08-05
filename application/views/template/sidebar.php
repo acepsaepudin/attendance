@@ -1,4 +1,5 @@
 <div class="panel-group" id="accordion">
+                        <?php if($this->session->userdata('user_role_id') == 1):?>
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h4 class="panel-title">
@@ -52,6 +53,7 @@
                         </div>
                     </div>
                 </div>
+                        <?php endif;?>
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">

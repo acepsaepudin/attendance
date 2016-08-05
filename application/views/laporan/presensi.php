@@ -29,7 +29,11 @@
         <td><?php echo $value->ATTENDANCE_IN_TIME;?></td>
         <td><?php echo $value->ATTENDANCE_OUT_TIME;?></td>
         <td><?php echo $value->STATUS;?></td>
-        <td><a href="<?php echo site_url('laporan/presensi_edit/'.$value->USERNAME);?>"><i class="glyphicon glyphicon-edit"></i></a></td>
+        <?php if($this->session->userdata('user_role_id') == 1):?>
+        <td>
+        <a href="<?php echo site_url('laporan/presensi_edit/'.$value->USERNAME);?>"><i class="glyphicon glyphicon-edit"></i></a>
+        </td>
+    <?php endif;?>
     </tr>
     <?php endforeach;?>
 </table>

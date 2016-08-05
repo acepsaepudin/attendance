@@ -3,7 +3,7 @@
     function __construct(){
         parent::__construct();
         $this->load->library(array('template', 'form_validation'));
-        $this->load->model(array('attendance_model','user_model'));
+        $this->load->model(array('attendance_model','user_model','salary_model'));
         
         if(!$this->session->userdata('username')){
             redirect('web');
@@ -40,7 +40,7 @@
         }
     }
 
-    public function data_gaji()
+    public function data_gaji($tgl =null)
     {
         $data['title']="Edit Data Karyawan";
         date_default_timezone_set("Asia/Jakarta");
@@ -48,37 +48,148 @@
         //ambil data user aktif
         $data_user = $this->user_model->get_all(array('status' => 'aktif'));
         $data_user = $data_user->result();
-        // $now = date('Y-m');
-        foreach ($data_user as $key => $value) {
-            //get data attendance one month
-            $res_data = $this->attendance_model->get_all("USERNAME = '".$value->USERNAME."' and ATTENDANCE_IN_DATE like '2016-08-%'")->result();
-            // if ($res_data) {
-                $month_attendance[$value->USERNAME] = $res_data;
-            // }
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            // $now = date('Y-m');
+            foreach ($data_user as $key => $value) {
+                //get data attendance one month
+                $res_data = $this->attendance_model->get_all("USERNAME = '".$value->USERNAME."' and ATTENDANCE_IN_DATE like '".$this->input->post('tahun').'-'.$this->input->post('bulan').'-%'."' and status in ('hadir','terlambat')")->result();
+                // if ($res_data) {
+                    $month_attendance[$value->USERNAME] = $res_data;
+                // }
+                
+            }
+            $data['tgl'] = $this->input->post('tanggal');
+            $data['thn'] = $this->input->post('tahun');
             
+        } else {
+            
+            // $now = date('Y-m');
+            foreach ($data_user as $key => $value) {
+                //get data attendance one month
+                $res_data = $this->attendance_model->get_all("USERNAME = '".$value->USERNAME."' and ATTENDANCE_IN_DATE like '".$this->get_previous_month().'-%'."' and status in ('hadir','terlambat')")->result();
+                // if ($res_data) {
+                    $month_attendance[$value->USERNAME] = $res_data;
+                // }
+                
+            }
+            $tanggal = explode('-', $this->get_previous_month());
+            $data['tgl'] = $tanggal[1];
+            $data['thn'] = $tanggal[0];
         }
+
         foreach ($month_attendance as $key => $value) {
             foreach ($value as $k => $v) {
+
                 // total sehari kerja
                 //ceil
-                $value[$k]->total_hours = floor($this->get_working_hours($v->ATTENDANCE_IN_DATE.' '.$v->ATTENDANCE_IN_TIME,$v->ATTENDANCE_OUT_DATE.' '.$v->ATTENDANCE_OUT_TIME));
+                // $value[$k]->total_hours = floor($this->get_working_hours($v->ATTENDANCE_IN_DATE.' '.$v->ATTENDANCE_IN_TIME,$v->ATTENDANCE_OUT_DATE.' '.$v->ATTENDANCE_OUT_TIME));
+                if ($v->STATUS == 'hadir') {
+                    //get user salary
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+                    $value[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'sakit') {
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+
+                    $value[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'izin') {
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+
+                    $value[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'terlambat') {
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+
+                    $value[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
+                }
 
             }
 
         }
+
         $month_salary = 0;
         foreach ($data_user as $key => $value) {
             $user_data = $month_attendance[$value->USERNAME];
             if ($user_data) {
                 foreach ($user_data as $k => $v) {
-                    $month_salary += $v->total_hours*18750;
+                    $month_salary += $v->today_salary;
                 }
                 $month_attendance[$value->USERNAME]['month_salary'] = $month_salary;
+                $month_attendance[$value->USERNAME]['dates'] = $this->get_previous_month();
                 $month_salary = 0;
             }
         }
         $data['gaji'] = $month_attendance;
+    
         $this->template->display('laporan/gaji',$data);
+    }
+
+    public function detail_gaji($username,$date)
+    {
+        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat')")->result();
+        foreach ($res_data as $k => $v) {
+                if ($v->STATUS == 'hadir') {
+                    //get user salary
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'sakit') {
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'izin') {
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'terlambat') {
+                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $weekdays = $this->get_weekdays(08,2016);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                // $res_data[$k]->month_salary += $res_data[$k]->today_salary;
+
+        }
+        // $month_salary = 0;
+        // foreach ($data_user as $key => $value) {
+        //     $user_data = $month_attendance[$value->USERNAME];
+        //     if ($user_data) {
+        //         foreach ($user_data as $k => $v) {
+        //             $month_salary += $v->today_salary;
+        //         }
+        //         $month_attendance[$value->USERNAME]['month_salary'] = $month_salary;
+        //         $month_attendance[$value->USERNAME]['dates'] = $this->get_previous_month();
+        //         // $month_salary = 0;
+        //     }
+        // }
+        // foreach ($res_data as $key => $value) {
+        //     $month_salary += $value->today_salary;
+        // }
+        // echo '<pre>';
+        // print_r($res_data);
+        // echo '</pre>';
+        // exit;
+        $data['gaji'] = $res_data;
+        $this->template->display('laporan/detail_gaji',$data);
+        
     }
 
     function get_working_hours($from,$to)
@@ -234,6 +345,31 @@
         printf("\nFrom %s To %s : %d hours\n",date('d/m/y H:i',$date1),date('d/m/y H:i',$date2),$seconds/3600);
 
         return $sign * $seconds/3600; // to get hours
+    }
+
+    public function get_weekdays($m,$y) {
+        $lastday = date("t",mktime(0,0,0,$m,1,$y));
+        $weekdays=0;
+        for($d=29;$d<=$lastday;$d++) {
+            $wd = date("w",mktime(0,0,0,$m,$d,$y));
+            if($wd > 0 && $wd < 6) $weekdays++;
+            }
+        return $weekdays+20;
+    }
+
+    public function get_previous_month($m=null,$y=null)
+    {
+        if ($m && $y) {
+            $month = date($m);
+            $year = date($y);
+            $last_month = $month-1%12;
+            return ($last_month==0?($year-1):$year)."-".($last_month==0?'12':($last_month < 10) ? '0'.$last_month : $last_month);
+        } else {
+            $month = date('m');
+            $year = date('Y');
+            $last_month = $month-1%12;
+            return ($last_month==0?($year-1):$year)."-".($last_month==0?'12':($last_month <10) ? '0'.$last_month : $last_month );
+        }
     }
     
 }

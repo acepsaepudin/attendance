@@ -7,7 +7,8 @@ class User_model extends CI_Model
         $this->db->select('*');
 		$this->db->where("username", $username);
         $this->db->where("password", $password);
-        $this->db->where("user_role_id", "1");        
+        // $this->db->where("user_role_id", "1");        
+        // $this->db->or_where("user_role_id", "2");        
 		return $this->db->get("user");
     }
 	

@@ -35,9 +35,15 @@ class Web extends CI_Controller{
             $username=$this->input->post('username');
             $password=$this->input->post('password');
             $cek=$this->user_model->cek($username,md5($password));
+            if ($cek->row()->USER_ROLE_ID == 2) {
+                $this->session->set_flashdata('message','Username anda tidak bisa login ke aplikasi.');
+                redirect('web');
+            }
             if($cek->num_rows()>0){
-                //login berhasil, buat session
+                //login berhasil, buat sessionf
+                
                 $this->session->set_userdata('username',$username);
+                $this->session->set_userdata('user_role_id',$cek->row()->USER_ROLE_ID);
                 redirect('dashboard');
                 
             }else{
