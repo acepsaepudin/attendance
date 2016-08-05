@@ -26,6 +26,35 @@
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#collapseFours"><span class="glyphicon glyphicon-file">
+                            </span> Kelola Gaji</a>
+                        </h4>
+                    </div>
+                    <div id="collapseFours" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <table class="table">
+                                <tr>
+                                    <td>
+                                        <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('karyawan/gaji_pokok');?>"> Gaji Pokok</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('laporan/data_gaji');?>"> Potongan Telat</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span class="glyphicon glyphicon-list-alt"></span><a href="<?php echo site_url('laporan/karyawan');?>"> Lembur</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
                             <a data-toggle="collapse" data-parent="#accordion" href="#collapseFour"><span class="glyphicon glyphicon-file">
                             </span> Laporan</a>
                         </h4>
@@ -52,7 +81,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <h4 class="panel-title">
