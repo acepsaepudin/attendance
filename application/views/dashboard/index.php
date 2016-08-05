@@ -35,10 +35,12 @@
         <div class="container">
 			<div class="col-sm-9 col-sm-offset-3">
             <ul class="glyphicons">
+            <?php if($this->session->userdata('user_role_id') == 1):?>
                 <li>
                   <span class="glyphicon glyphicon-user"></span>
                   <a href="<?php echo site_url('karyawan');?>">Karyawan</a>
                 </li>
+              <?php endif;?>
                 
                 <li>
                   <span class="glyphicon glyphicon-book"></span>
