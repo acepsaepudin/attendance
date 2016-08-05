@@ -86,7 +86,7 @@ class Karyawan extends CI_Controller{
             $nis=$this->input->post('nis');
             $cek=$this->m_anggota->cek($nis);
             if($cek->num_rows()>0){
-                $data['message']="<div class='alert alert-warning'>Nis sudah digunakan</div>";
+                $data['message']="<div class='alert alert-warning'>Username sudah digunakan</div>";
                 $this->template->display('anggota/tambah',$data);
             }else{
                 //setting konfiguras upload image

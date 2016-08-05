@@ -51,7 +51,7 @@
         // $now = date('Y-m');
         foreach ($data_user as $key => $value) {
             //get data attendance one month
-            $res_data = $this->attendance_model->get_all("USERNAME = '".$value->USERNAME."' and ATTENDANCE_IN_DATE like '2016-06-%'")->result();
+            $res_data = $this->attendance_model->get_all("USERNAME = '".$value->USERNAME."' and ATTENDANCE_IN_DATE like '2016-08-%'")->result();
             // if ($res_data) {
                 $month_attendance[$value->USERNAME] = $res_data;
             // }
