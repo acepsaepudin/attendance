@@ -189,11 +189,13 @@ class Karyawan extends CI_Controller{
 
     public function update_gaji_pokok($username)
     {
-        $this->load->model('salary_model');
+        $this->load->model(['salary_model', 'userrole_model']);
         $data['title']="Gaji Pokok";
         $this->form_validation->set_rules('gapok', 'Gaji Pokok', 'required|is_natural');
         $data['salary'] = $this->salary_model->get_by_id(['USERNAME' => $username]);
         $data['karyawan'] = $this->user_model->get_by_id(['USERNAME' => $username]);
+        $data['role'] = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $data['karyawan']->USER_ROLE_ID]);
+        
         
         if ($this->form_validation->run() == false) {
             $data['message']="";

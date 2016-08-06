@@ -12,6 +12,12 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="col-lg-2 control-label">Jabatan</label>
+        <div class="col-lg-5">
+            <input type="text" name="name" class="form-control" value="<?php echo $role->USER_ROLE_NAME;?>" readonly="readonly">
+        </div>
+    </div>
+    <div class="form-group">
         <label class="col-lg-2 control-label">Gaji Pokok</label>
         <div class="col-lg-5">
             <input type="text" name="gapok" class="form-control" value="<?php echo (isset($salary->USER_SALARY)) ? $salary->USER_SALARY : '';?>">
