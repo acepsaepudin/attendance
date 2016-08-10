@@ -1,11 +1,11 @@
 <div class="nav navbar-nav navbar-right">
-    <form class="navbar-form navbar-left" role="search" action="<?php echo site_url('karyawan/cari_gaji_pokok');?>" method="post">
+    <!-- <form class="navbar-form navbar-left" role="search" action="<?php echo site_url('karyawan/cari_gaji_pokok');?>" method="post">
         <div class="form-group">
             <label>Cari Nama</label>
             <input type="text" class="form-control" placeholder="Search" name="cari">
         </div>
         <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-search"></i> Cari</button>
-    </form>
+    </form> -->
 </div>
 <hr>
 <?php echo $message;?>
@@ -13,25 +13,20 @@
     <thead>
         <tr>
             <td>No.</td>
-            <td>Username</td>
-            <td>Nama Lengkap</td>
-            <td>JK</td>
-            <td>Tanggal Lahir</td>
-            <td>Alamat</td>
-			<td>Status</td>
+            <td>ID</td>
+            <td>Jabatan</td>
+            <td>Gaji Pokok</td>
+            
             <td colspan="2"></td>
         </tr>
     </thead>
     <?php $no=0; foreach($karyawan as $row ): $no++;?>
     <tr>
         <td><?php echo $no;?></td>
-        <td><?php echo $row->USERNAME;?></td>
-        <td><?php echo $row->FULL_NAME;?></td>
-        <td><?php echo $row->GENDER;?></td>
-        <td><?php echo $row->BIRTHDATE;?></td>
-        <td><?php echo $row->ADDRESS;?></td>
-		<td><?php echo $row->STATUS;?></td>
-        <td><a href="<?php echo site_url('karyawan/update_gaji_pokok/'.$row->USERNAME);?>"><i class="glyphicon glyphicon-edit"></i> Update Gaji Pokok</a></td>
+        <td><?php echo $row->USER_ROLE_ID;?></td>
+        <td><?php echo $row->USER_ROLE_NAME;?></td>
+        <td><?php echo $row->SALARY;?></td>
+        <td><a href="<?php echo site_url('karyawan/update_gaji_pokok/'.$row->USER_ROLE_ID);?>"><i class="glyphicon glyphicon-edit"></i> Update Gaji Pokok</a></td>
         <!-- <td><a href="#" class="hapus" kode="<?php echo $row->USERNAME;?>"><i class="glyphicon glyphicon-trash"></i></a></td> -->
     </tr>
     <?php endforeach;?>

@@ -10,3 +10,5 @@ create table late(
 	LATE_VALUE int(100),
 	primary key(id)
 );
+
+alter table user_role add SALARY varchar(255);

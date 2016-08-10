@@ -168,25 +168,7 @@
                 // $res_data[$k]->month_salary += $res_data[$k]->today_salary;
 
         }
-        // $month_salary = 0;
-        // foreach ($data_user as $key => $value) {
-        //     $user_data = $month_attendance[$value->USERNAME];
-        //     if ($user_data) {
-        //         foreach ($user_data as $k => $v) {
-        //             $month_salary += $v->today_salary;
-        //         }
-        //         $month_attendance[$value->USERNAME]['month_salary'] = $month_salary;
-        //         $month_attendance[$value->USERNAME]['dates'] = $this->get_previous_month();
-        //         // $month_salary = 0;
-        //     }
-        // }
-        // foreach ($res_data as $key => $value) {
-        //     $month_salary += $value->today_salary;
-        // }
-        // echo '<pre>';
-        // print_r($res_data);
-        // echo '</pre>';
-        // exit;
+
         $data['gaji'] = $res_data;
         $this->template->display('laporan/detail_gaji',$data);
         
