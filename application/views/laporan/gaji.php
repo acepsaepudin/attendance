@@ -4,12 +4,12 @@
             <label>Cari Gaji Berdasarkan Bulan</label>
             <select class="form-control" name="tahun">
                 <?php for($i=1990;$i<=date('Y');$i++):?>
-                    <option value="<?php echo $i;?>"><?php echo $i?></option>
+                    <option value="<?php echo $i;?>" <?php echo ($thn == $i) ? 'selected':''?> ><?php echo $i?></option>
                 <?php endfor;?>
             </select>
             <select class="form-control" name="bulan">
                 <?php for($i=1;$i<=12;$i++):?>
-                    <option value="<?php echo ($i <10) ? '0'.$i:$i;?>" ><?php echo ($i < 10) ? '0'.$i:$i;?></option>
+                    <option value="<?php echo ($i <10) ? '0'.$i:$i;?>" <?php if($tgl<10){if($tgl == '0'.$i){ echo 'selected';}} if($tgl>= 10){if($tgl == $i){echo 'selected';}}?> ><?php echo ($i < 10) ? '0'.$i:$i;?></option>
                 <?php endfor;?>
             </select>
         </div>

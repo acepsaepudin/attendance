@@ -3,7 +3,7 @@
     function __construct(){
         parent::__construct();
         $this->load->library(array('template', 'form_validation'));
-        $this->load->model(array('attendance_model','user_model','salary_model'));
+        $this->load->model(array('attendance_model','user_model','salary_model','userrole_model'));
         
         if(!$this->session->userdata('username')){
             redirect('web');
@@ -58,7 +58,7 @@
                 // }
                 
             }
-            $data['tgl'] = $this->input->post('tanggal');
+            $data['tgl'] = $this->input->post('bulan');
             $data['thn'] = $this->input->post('tahun');
             
         } else {
@@ -76,7 +76,6 @@
             $data['tgl'] = $tanggal[1];
             $data['thn'] = $tanggal[0];
         }
-
         foreach ($month_attendance as $key => $value) {
             foreach ($value as $k => $v) {
 
@@ -85,28 +84,35 @@
                 // $value[$k]->total_hours = floor($this->get_working_hours($v->ATTENDANCE_IN_DATE.' '.$v->ATTENDANCE_IN_TIME,$v->ATTENDANCE_OUT_DATE.' '.$v->ATTENDANCE_OUT_TIME));
                 if ($v->STATUS == 'hadir') {
                     //get user salary
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($data['tgl'],$data['thn']);
                     $day_salary = $salary / $weekdays;
                     $value[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
                 if ($v->STATUS == 'sakit') {
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($data['tgl'],$data['thn']);
                     $day_salary = $salary / $weekdays;
 
                     $value[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
                 if ($v->STATUS == 'izin') {
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($data['tgl'],$data['thn']);
                     $day_salary = $salary / $weekdays;
 
                     $value[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
                 if ($v->STATUS == 'terlambat') {
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($data['tgl'],$data['thn']);
                     $day_salary = $salary / $weekdays;
 
                     $value[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
@@ -135,32 +141,41 @@
 
     public function detail_gaji($username,$date)
     {
+        $exdate = explode('-', $date);
         $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat')")->result();
         foreach ($res_data as $k => $v) {
                 if ($v->STATUS == 'hadir') {
                     //get user salary
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
                     $day_salary = $salary / $weekdays;
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
                 if ($v->STATUS == 'sakit') {
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
                 if ($v->STATUS == 'izin') {
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
                 if ($v->STATUS == 'terlambat') {
-                    $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
-                    $weekdays = $this->get_weekdays(08,2016);
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
