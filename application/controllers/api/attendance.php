@@ -47,8 +47,8 @@ class Attendance extends REST_Controller
 					'username' => post('username'),
 					'office_id' => '1',
 					'attendance_id' => $epoch->format('U'),
-					'attendance_in_date' => $masuk->format('Y-m-d'),
-					'attendance_in_time' => $masuk->format('H:i:s'),
+					'attendance_in_date' => date('Y-m-d'),
+					'attendance_in_time' => date('H:i:s'),
 					'attendance_out_date' => '',
 					'attendance_out_time' => '',
 					'latitude_in' => post('latitude'),
@@ -67,8 +67,8 @@ class Attendance extends REST_Controller
 					'username' => post('username'),
 					'office_id' => '1',
 					'attendance_id' => $epoch->format('U'),
-					'attendance_in_date' => $masuk->format('Y-m-d'),
-					'attendance_in_time' => $masuk->format('H:i:s'),
+					'attendance_in_date' => date('Y-m-d'),
+					'attendance_in_time' => date('H:i:s'),
 					'attendance_out_date' => '',
 					'attendance_out_time' => '',
 					'latitude_in' => post('latitude'),
@@ -116,16 +116,16 @@ class Attendance extends REST_Controller
 					//inputan dibawah jam 9 malam
 					if ($b->invert == 1) {
 						$absen = array(
-							'attendance_out_date' => $input_pulang->format('Y-m-d'),
-							'attendance_out_time' => $input_pulang->format('H:i:s'),
+							'attendance_out_date' => date('Y-m-d'),
+							'attendance_out_time' => date('H:i:s'),
 							'latitude_in' => post('latitude'),
 							'longitude_in' => post('longitude')	
 						);
 					} else {
 						//inputan diatas jam 9 malam,jadi input dipaksa lembur hanya sampai jam 9 malam saja.
 						$absen = array(
-							'attendance_out_date' => $max_db_input->format('Y-m-d'),
-							'attendance_out_time' => $max_db_input->format('H:i:s'),
+							'attendance_out_date' => date('Y-m-d'),
+							'attendance_out_time' => date('H:i:s'),
 							'latitude_in' => post('latitude'),
 							'longitude_in' => post('longitude')	
 						);
