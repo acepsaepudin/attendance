@@ -10,6 +10,12 @@
         </div>
     </div>
     <div class="form-group">
+        <label class="col-lg-2 control-label">IMEI</label>
+        <div class="col-lg-5">
+            <input type="text" name="imei" class="form-control" value="<?php echo $karyawan['imei_number'];?>" >
+        </div>
+    </div>
+    <div class="form-group">
         <label class="col-lg-2 control-label">Nama</label>
         <div class="col-lg-5">
             <input type="text" name="nama" class="form-control" value="<?php echo $karyawan['full_name'];?>">

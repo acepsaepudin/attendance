@@ -59,6 +59,7 @@ class Karyawan extends CI_Controller{
                 'GENDER'=>$this->input->post('jk'),
 				'ADDRESS'=>$this->input->post('alamat'),
 				'STATUS'=>$this->input->post('status'),
+				'IMEI_NUMBER'=>$this->input->post('imei'),
                 // 'image'=>$gambar
             );
             //update data angggota

@@ -31,7 +31,7 @@ class User_model extends CI_Model
     }
 	
 	function cek_karyawan($user){
-        $this->db->select('username, full_name, gender, birthdate, address, status');
+        $this->db->select('username, full_name, gender, birthdate, address, status,imei_number');
 		$this->db->where("username", $user);
         $this->db->where("user_role_id", "2");
         return $this->db->get("user");
