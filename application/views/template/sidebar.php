@@ -71,6 +71,11 @@
                                 </tr>
                                 <tr>
                                     <td>
+                                        <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('laporan/list_presensi');?>"> Input Presensi</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         <span class="glyphicon glyphicon-book"></span><a href="<?php echo site_url('laporan/data_gaji');?>"> Data Gaji</a>
                                     </td>
                                 </tr>

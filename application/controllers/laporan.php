@@ -26,6 +26,82 @@
             $this->template->display('laporan/presensi',$data);
         }
     }
+    function list_presensi(){
+        $data['title']="Input Presensi";
+        $data['message']="";
+        $data_user = $this->user_model->get_all(array('status' => 'aktif'));
+        $this->form_validation->set_rules('tgl','Tanggal','required');
+        if ($this->form_validation->run() == false) {
+            
+            $data['user'] = $data_user->result();
+            $this->template->display('laporan/presensi_input',$data);
+        } else {
+            date_default_timezone_set("Asia/Jakarta");
+            $epoch = new DateTime(date('Y/m/d H:i:s'));
+            $attendance_id = $epoch->format('U');
+            $stat = $this->input->post('status');
+            $tgl = $this->input->post('tgl');
+            $array_data = array(
+                    ''
+                );
+            switch ($stat) {
+                case 'sakit':
+                    $array_data = array(
+                        'USERNAME' => $this->input->post('username'),
+                        'OFFICE_ID' => 1,
+                        'ATTENDANCE_ID' => $attendance_id,
+                        'ATTENDANCE_IN_DATE' => $tgl,
+                        'ATTENDANCE_IN_TIME' => '08:00:00',
+                        'ATTENDANCE_OUT_DATE' => $tgl,
+                        'ATTENDANCE_OUT_TIME' => '16:00:00',
+                        'STATUS' => $stat
+                        );
+                    break;
+                case 'izin':
+                    $array_data = array(
+                        'USERNAME' => $this->input->post('username'),
+                        'OFFICE_ID' => 1,
+                        'ATTENDANCE_ID' => $attendance_id,
+                        'ATTENDANCE_IN_DATE' => $tgl,
+                        'ATTENDANCE_IN_TIME' => '08:00:00',
+                        'ATTENDANCE_OUT_DATE' => $tgl,
+                        'ATTENDANCE_OUT_TIME' => '16:00:00',
+                        'STATUS' => $stat
+                        );
+                    break;
+                case 'tugas_luar':
+                    $array_data = array(
+                        'USERNAME' => $this->input->post('username'),
+                        'OFFICE_ID' => 1,
+                        'ATTENDANCE_ID' => $attendance_id,
+                        'ATTENDANCE_IN_DATE' => $tgl,
+                        'ATTENDANCE_IN_TIME' => '08:00:00',
+                        'ATTENDANCE_OUT_DATE' => $tgl,
+                        'ATTENDANCE_OUT_TIME' => '16:00:00',
+                        'STATUS' => $stat
+                        );
+                    break;
+                case 'cuti':
+                    $array_data = array(
+                        'USERNAME' => $this->input->post('username'),
+                        'OFFICE_ID' => 1,
+                        'ATTENDANCE_ID' => $attendance_id,
+                        'ATTENDANCE_IN_DATE' => $tgl,
+                        'ATTENDANCE_IN_TIME' => '08:00:00',
+                        'ATTENDANCE_OUT_DATE' => $tgl,
+                        'ATTENDANCE_OUT_TIME' => '16:00:00',
+                        'STATUS' => $stat
+                        );
+                    break;
+                
+                
+            }   
+            $this->attendance_model->save($array_data);         
+            $this->session->set_flashdata('sukses',"<div class='alert alert-success'>Berhasil Menyimpan Presensi.</div>");
+            redirect('laporan/presensi');
+        }
+        
+    }
 
     public function presensi_edit($username)
     {
