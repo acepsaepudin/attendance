@@ -15,6 +15,13 @@
 		<div>
 			<table>
 				<tr>
+					<td>Username</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>: <?php echo $user->USERNAME;?></td>
+				</tr>
+				<tr>
 					<td>Nama</td>
 					<td>&nbsp;</td>
 					<td>&nbsp;</td>
