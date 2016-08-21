@@ -85,4 +85,28 @@ class Dashboard extends CI_Controller{
         $this->session->unset_userdata('username');
         redirect('web');
     }
+
+    public function working_days()
+    {
+        $this->load->model('workingdays_model');
+        $data['title'] = "Input Hari Kerja";
+        $this->form_validation->set_rules('days', 'Jumlah Hari Kerja','required|is_natural');
+        if ($this->form_validation->run() == false) {
+            $data['message'] = '';
+            $this->template->display('dashboard/working_days',$data);
+        } else {
+            $get_data = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $this->input->post('working_month')]);
+            if ($get_data) {
+                $this->workingdays_model->update(['WORKING_DAYS' => $this->input->post('days')], ['WORKING_MONTH' => $this->input->post('working_month')]);
+                $this->session->set_flashdata('sukses',"<div class='alert alert-success'>Berhasil Menyimpan Hari Kerja.</div>");
+                redirect('dashboard/working_days');
+            } else {
+                $this->workingdays_model->save(['WORKING_MONTH' => $this->input->post('working_month'), 'WORKING_DAYS' => $this->input->post('days')]);
+
+                $this->session->set_flashdata('sukses',"<div class='alert alert-success'>Berhasil Menyimpan Hari Kerja.</div>");
+                redirect('dashboard/working_days');
+            }
+            
+        }
+    }
 }

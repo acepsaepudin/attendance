@@ -20,6 +20,11 @@
                                                     <span class="glyphicon glyphicon-user"></span> <a href="<?php echo site_url('dashboard/admin');?>">Admin</a>
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <td>
+                                                    <span class="glyphicon glyphicon-tags"></span> <a href="<?php echo site_url('dashboard/working_days');?>"> Input hari kerja</a>
+                                                </td>
+                                            </tr>
                                         </table>
                                     </div>
                                 </div>

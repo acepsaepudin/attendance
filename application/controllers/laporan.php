@@ -5,7 +5,7 @@ class Laporan extends CI_Controller{
     function __construct(){
         parent::__construct();
         $this->load->library(array('template', 'form_validation'));
-        $this->load->model(array('attendance_model','user_model','salary_model','userrole_model','late_model'));
+        $this->load->model(array('attendance_model','user_model','salary_model','userrole_model','late_model','workingdays_model'));
         
         if(!$this->session->userdata('username')){
             redirect('web');
@@ -220,14 +220,16 @@ class Laporan extends CI_Controller{
     public function detail_gaji($username,$date)
     {
         $exdate = explode('-', $date);
-        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat','absen')")->result();
+        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat','absen','sakit','cuti')")->result();
         foreach ($res_data as $k => $v) {
                 if ($v->STATUS == 'hadir') {
                     //get user salary
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
@@ -235,7 +237,20 @@ class Laporan extends CI_Controller{
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'cuti') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
@@ -244,7 +259,9 @@ class Laporan extends CI_Controller{
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
@@ -253,7 +270,9 @@ class Laporan extends CI_Controller{
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
@@ -451,14 +470,27 @@ class Laporan extends CI_Controller{
     public function print_gaji($username,$date)
     {
         $exdate = explode('-', $date);
-        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat')")->result();
+        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat','sakit','cuti')")->result();
         foreach ($res_data as $k => $v) {
                 if ($v->STATUS == 'hadir') {
                     //get user salary
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
+                    $day_salary = $salary / $weekdays;
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'cuti') {
+                    //get user salary
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
                 }
@@ -466,7 +498,9 @@ class Laporan extends CI_Controller{
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
@@ -475,7 +509,9 @@ class Laporan extends CI_Controller{
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
@@ -484,7 +520,9 @@ class Laporan extends CI_Controller{
                     // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
                     $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
                     $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
-                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    // $day_salary = $salary / $weekdays;
+                    $weekdays = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
                     $day_salary = $salary / $weekdays;
 
                     $res_data[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
@@ -500,7 +538,7 @@ class Laporan extends CI_Controller{
         $data = [];
         $data['terlambat'] = $terlambat;
         $data['hadir'] =  $hadir;
-        $data['working_days'] = $terlambat + $hadir;
+        $data['working_days'] = $this->workingdays_model->get_by_id(['WORKING_MONTH' => $exdate[1]])->WORKING_DAYS;
         $data['sal'] = $total;
         
         $data['telat'] = $this->late_model->get_all()->row();

@@ -71,7 +71,7 @@
 				
 				<table style="margin: 10px 0 0 0;">
 					<tr>
-						<td>Datang Telat</td>
+						<td>Keterlambatan</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
@@ -87,7 +87,7 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
-						<td><?php echo $salary->USER_SALARY?></td>
+						<td><?php echo $terlambat.' x'.number_format(round((($salary->USER_SALARY/$working_days))),2,",",".");?></td>
 					</tr>
 				</table>
 			</div>
@@ -102,7 +102,7 @@
 						<td>: <?php echo $hadir;?></td>
 					</tr>
 					<tr>
-						<td>Absence</td>
+						<td>Terlambat</td>
 						<td>: <?php echo $terlambat;?></td>
 					</tr>
 				</table>
@@ -145,7 +145,7 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						
-						<td><?php echo '<strong>'.$salary->USER_SALARY.'</strong>';?></td>
+						<td><?php echo '<strong>'.number_format(round(($salary->USER_SALARY/$working_days),0)*$terlambat,2,",",".").'</strong>';?></td>
 					</tr>
 				</table>
 		</div>

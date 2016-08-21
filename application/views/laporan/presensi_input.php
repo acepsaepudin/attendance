@@ -27,7 +27,7 @@
                 <option value="izin" >Izin</option>
                 <option value="sakit" >Sakit</option>
                 <option value="cuti" >Cuti</option>
-                <option value="tugas_luar" >Perjalanan Dinas</option>
+                <!-- <option value="tugas_luar" >Perjalanan Dinas</option> -->
                 <!-- <option value="absen" >Alfa</option> -->
             </select>
         </div>
