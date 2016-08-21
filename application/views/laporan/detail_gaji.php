@@ -27,7 +27,7 @@
             <td>Jam Masuk</td>
             <td>Tanggal Pulang</td>
             <td>Jam Pulang</td>
-            <td>Gaji Perhari</td>
+            <!-- <td>Gaji Perhari</td> -->
             <td>Status</td>
 			<!-- <td>Action</td> -->
             <!-- <td colspan="2"></td> -->
@@ -45,7 +45,7 @@
         <td><?=$value->ATTENDANCE_IN_TIME?></td>
         <td><?=$value->ATTENDANCE_OUT_DATE?></td>
         <td><?=$value->ATTENDANCE_OUT_TIME?></td>
-        <td>Rp. <?=$value->today_salary?></td>
+        <!-- <td>Rp. <?=$value->today_salary?></td> -->
         <td><?=$value->STATUS?></td>
         
     </tr>
