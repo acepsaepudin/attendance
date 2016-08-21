@@ -1,9 +1,11 @@
-<?php class Laporan extends CI_Controller{
+<?php 
+include_once APPPATH.'/third_party/mpdf/mpdf.php';
+class Laporan extends CI_Controller{
     
     function __construct(){
         parent::__construct();
         $this->load->library(array('template', 'form_validation'));
-        $this->load->model(array('attendance_model','user_model','salary_model','userrole_model'));
+        $this->load->model(array('attendance_model','user_model','salary_model','userrole_model','late_model'));
         
         if(!$this->session->userdata('username')){
             redirect('web');
@@ -218,7 +220,7 @@
     public function detail_gaji($username,$date)
     {
         $exdate = explode('-', $date);
-        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat')")->result();
+        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat','absen')")->result();
         foreach ($res_data as $k => $v) {
                 if ($v->STATUS == 'hadir') {
                     //get user salary
@@ -259,7 +261,8 @@
                 // $res_data[$k]->month_salary += $res_data[$k]->today_salary;
 
         }
-
+        $data['username'] = $username;
+        $data['date'] = $date;
         $data['gaji'] = $res_data;
         $this->template->display('laporan/detail_gaji',$data);
         
@@ -443,6 +446,169 @@
             $last_month = $month-1%12;
             return ($last_month==0?($year-1):$year)."-".($last_month==0?'12':($last_month <10) ? '0'.$last_month : $last_month );
         }
+    }
+
+    public function print_gaji($username,$date)
+    {
+        $exdate = explode('-', $date);
+        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat')")->result();
+        foreach ($res_data as $k => $v) {
+                if ($v->STATUS == 'hadir') {
+                    //get user salary
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'sakit') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'izin') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'terlambat') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                // $res_data[$k]->month_salary += $res_data[$k]->today_salary;
+
+        }
+        foreach ($res_data as $key => $value) {
+            $terlambat += ($value->STATUS == 'terlambat') ? 1 : 0;
+            $hadir += ($value->STATUS == 'hadir') ? 1 : 0;
+            $total += $value->today_salary;
+        }
+        $data = [];
+        $data['terlambat'] = $terlambat;
+        $data['hadir'] =  $hadir;
+        $data['working_days'] = $terlambat + $hadir;
+        $data['sal'] = $total;
+        
+        $data['telat'] = $this->late_model->get_all()->row();
+        
+        $data['date'] = $date;
+        $data['username'] = $username;
+        $data['salary'] = $this->salary_model->get_by_id(['USERNAME' => $username]);
+        $data['user'] = $this->user_model->get_by_id(['USERNAME' => $username]);
+        $data['role'] = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $data['user']->USER_ROLE_ID]);
+
+        //load the view and saved it into $html variable
+        $html=$this->load->view('print/gaji', $data, true);
+        $mpdf = new mPDF('', 'A4');
+
+        $mpdf->AddPage('L'); // Adds a new page in Landscape orientation
+
+        $mpdf->WriteHTML($html);
+
+        $mpdf->Output();
+ 
+        //this the the PDF filename that user will get to download
+       //  $pdfFilePath = "output_pdf_name.pdf";
+ 
+       //  //load mPDF library
+       //  // $this->load->library('m_pdf');
+
+       //  $m_pdf = new mPDF('utf-8', 'P');
+
+       // //generate the PDF from the given html
+       //  $m_pdf->WriteHTML($html);
+ 
+       //  //download it.
+       //  $m_pdf->Output($pdfFilePath, "I");
+    }
+
+    public function print_absensi($username,$date)
+    {
+        
+        $exdate = explode('-', $date);
+        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."'")->result();
+        foreach ($res_data as $k => $v) {
+                if ($v->STATUS == 'hadir') {
+                    //get user salary
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'sakit') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'izin') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'terlambat') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                // $res_data[$k]->month_salary += $res_data[$k]->today_salary;
+
+        }
+        // foreach ($res_data as $key => $value) {
+        //     $terlambat += ($value->STATUS == 'terlambat') ? 1 : 0;
+        //     $hadir += ($value->STATUS == 'hadir') ? 1 : 0;
+        //     $total += $value->today_salary;
+        // }
+        // $data = [];
+        // $data['terlambat'] = $terlambat;
+        // $data['hadir'] =  $hadir;
+        // $data['working_days'] = $terlambat + $hadir;
+        // $data['sal'] = $total;
+        $data['gaji'] = $res_data;
+        $data['telat'] = $this->late_model->get_all()->row();
+        
+        $data['date'] = $date;
+        $data['username'] = $username;
+        $data['salary'] = $this->salary_model->get_by_id(['USERNAME' => $username]);
+        $data['user'] = $this->user_model->get_by_id(['USERNAME' => $username]);
+        $data['role'] = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $data['user']->USER_ROLE_ID]);
+
+        //load the view and saved it into $html variable
+        $html=$this->load->view('print/absensi', $data, true);
+        $mpdf = new mPDF('', 'A4');
+
+        $mpdf->AddPage('P'); // Adds a new page in Landscape orientation
+
+        $mpdf->WriteHTML($html);
+
+        $mpdf->Output();
     }
     
 }

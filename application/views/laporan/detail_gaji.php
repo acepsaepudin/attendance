@@ -67,7 +67,16 @@
         <td><?=$hadir;?> Hari</td>
     </tr>
 </Table>
+<?php 
+//untuk print
+// $_SESSION['print_terlambat'] = $terlambat;
+// $_SESSION['print_working_days'] = $hadir + $terlambat;
+// $_SESSION['print_hadir'] = $hadir;
+
+?>
 <a href="<?=site_url('laporan/data_gaji')?>" class="btn btn-info">Kembali</a>
+<a href="<?=site_url('laporan/print_gaji/'.$username.'/'.$date)?>" class="btn btn-success">Print Gaji</a>
+<a href="<?=site_url('laporan/print_absensi/'.$username.'/'.$date)?>" class="btn btn-success">Print Absensi</a>
 <?php //echo $pagination;?>
 
 <script>
