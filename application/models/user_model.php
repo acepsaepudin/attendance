@@ -68,7 +68,7 @@ class User_model extends CI_Model
 		$this->db->select('username, imei_number');
 		$this->db->from('user');
 		$this->db->where('username', $username);
-		$this->db->where('imei', $imei);
+		$this->db->where('imei_number', $this->input->post('imei'));
 		$this->db->where('password', md5($password));
 		
 		$query = $this->db->get();

@@ -7,16 +7,16 @@ class Attendance extends REST_Controller
 	function __construct()
     {
     	parent::__construct();
-		$this->load->model('attendance_model');
+		$this->load->model(['attendance_model','userrole_model','user_model','salary_model']);
     }
 	
 	function masuk_post()
     {
     	date_default_timezone_set("Asia/Jakarta");
-		$model = $this->attendance_model->get_date();
+		$model = $this->attendance_model->get_date_masuk();
 		if(empty($model)){
 			//cek jam masuk ganti kalau mau testing
-			$max_hours = DateTime::createFromFormat('H:i','08:00');
+			$max_hours = DateTime::createFromFormat('H:i','09:00');
 
 			$input = DateTime::createFromFormat('H:i', date('H:i'));
 			$a = $max_hours->diff($input);
@@ -36,13 +36,13 @@ class Attendance extends REST_Controller
 				);
 				$this->attendance_model->save($absen);
 				// die("lebih dari 8 30");
-				$this->response(array('success' => true, 'message' => 'Anda Sudah Tidak Diperbolehkan Presensi Masuk.', 'responseCode' => 200), 200);
+				$this->response(array('success' => true, 'message' => 'Anda Sudah Tidak Diperbolehkan Untuk Presensi Masuk.', 'responseCode' => 200), 200);
 			}
-			if (($a->invert == 0) && ($a->h == 0) && ($a->i > 15)) {
+			if (($a->invert == 0) && ($a->h == 0) && ($a->i > 30)) {
 				// die('telat dipotong 4 jam');
 				$epoch = new DateTime(date('Y/m/d H:i:s'));	
 				//ganti jam masuk start dari jam 12
-				$masuk = DateTime::createFromFormat('H:i','12:00');
+				$masuk = DateTime::createFromFormat('H:i','09:00');
 				$absen = array(
 					'username' => post('username'),
 					'office_id' => '1',
@@ -62,7 +62,7 @@ class Attendance extends REST_Controller
 			else {
 				//dianggap masuk jam 8 untuk perhitungan gaji
 				$epoch = new DateTime(date('Y/m/d H:i:s'));
-				$masuk = DateTime::createFromFormat('H:i','08:00');
+				$masuk = DateTime::createFromFormat('H:i','09:00');
 				$absen = array(
 					'username' => post('username'),
 					'office_id' => '1',
@@ -134,7 +134,7 @@ class Attendance extends REST_Controller
 					$this->response(array('success' => true, 'message' => 'Presensi Pulang Berhasil', 'responseCode' => 200), 200);
 				} else {
 					//sudah pernah klik absen pulang
-					$this->response(array('success' => false, 'message' => 'Anda Sudah Melakukan Absen Pulang', 'responseCode' => 406), 406);
+					$this->response(array('success' => false, 'message' => 'Anda Sudah Melakukan Presensi Pulang', 'responseCode' => 406), 406);
 				}
 			} else {
 				$this->response(array('success' => false, 'message' => 'Anda Absen Hari ini', 'responseCode' => 406), 406);
@@ -191,6 +191,74 @@ class Attendance extends REST_Controller
 		} else {
 			$this->response(array('success' => true, 'message' => 'Sudah Absen', 'responseCode' => 406), 406);
 		}		
+    }
+
+    public function detail_gaji_get()
+    {
+    	$username = 'verajuliantika';
+    	$date = '2016-07';
+        $exdate = explode('-', $date);
+        $res_data = array();
+        $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat')")->result();
+        foreach ($res_data as $k => $v) {
+                if ($v->STATUS == 'hadir') {
+                    //get user salary
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'sakit') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'izin') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                if ($v->STATUS == 'terlambat') {
+                    // $salary = $this->salary_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_SALARY;
+                    $role_user = $this->user_model->get_by_id(['USERNAME' => $v->USERNAME])->USER_ROLE_ID;
+                    $salary = $this->userrole_model->get_by_id(['USER_ROLE_ID' => $role_user])->SALARY;
+                    $weekdays = $this->get_weekdays($exdate[1],$exdate[0]);
+                    $day_salary = $salary / $weekdays;
+
+                    $res_data[$k]->today_salary = round($day_salary / 2,0); //pembulatan keatas sampai hilang nilai desimal
+                }
+                // $res_data[$k]->month_salary += $res_data[$k]->today_salary;
+
+        }
+
+        $data['attendance'] = $res_data;
+        // $this->template->display('laporan/detail_gaji',$data);
+        // $this->response(array('success' => true, 'attendance' => $res_data, 'responseCode' => 200), 200);
+  
+        header('Content-Type: application/json');
+        echo json_encode(array('attendance' => $res_data));
+
+        die();
+    }
+
+    public function get_weekdays($m,$y) {
+        $lastday = date("t",mktime(0,0,0,$m,1,$y));
+        $weekdays=0;
+        for($d=29;$d<=$lastday;$d++) {
+            $wd = date("w",mktime(0,0,0,$m,$d,$y));
+            if($wd > 0 && $wd < 6) $weekdays++;
+            }
+        return $weekdays+20;
     }
 }
 

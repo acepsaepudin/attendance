@@ -7,9 +7,9 @@ class Laporan extends CI_Controller{
         $this->load->library(array('template', 'form_validation'));
         $this->load->model(array('attendance_model','user_model','salary_model','userrole_model','late_model','workingdays_model'));
         
-        if(!$this->session->userdata('username')){
-            redirect('web');
-        }
+        // if(!$this->session->userdata('username')){
+        //     redirect('web');
+        // }
     }
      
     function presensi(){
@@ -219,6 +219,7 @@ class Laporan extends CI_Controller{
 
     public function detail_gaji($username,$date)
     {
+        $data['title'] = 'Detail Gaji';
         $exdate = explode('-', $date);
         $res_data = $this->attendance_model->get_all("USERNAME = '".$username."' and ATTENDANCE_IN_DATE like '".$date.'-%'."' and status in ('hadir','terlambat','absen','sakit','cuti')")->result();
         foreach ($res_data as $k => $v) {

@@ -4,10 +4,13 @@ class Attendance_model extends CI_Model
 {
  	function get_date()
  	{
+     $tgl = date('Y-m-d'); //pake ini klo pake tanggal real hari ini
+    //$tgl ='2016-07-03'; //pake ini jika mau test beda tanggal pulang
+
  		$this->db->select('attendance_id, attendance_in_date');
    		$this->db->from('attendance');
-      $this->db->where('username',post('username'));
-    $this->db->where("attendance_in_date =  '". date('Y-m-d') . "'");
+      // $this->db->where('username',post('username'));
+    $this->db->where("attendance_in_date =  '". $tgl . "'");
 		
    		$query = $this->db->get();
 
@@ -20,6 +23,25 @@ class Attendance_model extends CI_Model
      		return null;
    		}
  	}
+
+  public function get_date_masuk()
+  {
+    $this->db->select('attendance_id, attendance_in_date');
+      $this->db->from('attendance');
+      $this->db->where('username',post('username'));
+    $this->db->where("attendance_in_date =  '".date('Y-m-d') . "'");
+    
+      $query = $this->db->get();
+
+      if($query -> num_rows() > 0)
+      {
+        return $query->row();
+      }
+      else
+      {
+        return null;
+      }
+  }
 	 
 	function get_info_attendance()
  	{

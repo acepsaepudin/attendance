@@ -17,7 +17,7 @@
             <select name="status" class="form-control">
                 <option value="izin" <?php echo ($presensi->STATUS == 'izin') ? 'selected' : '';?>>Izin</option>
                 <option value="sakit" <?php echo ($presensi->STATUS == 'sakit') ? 'selected' : '';?>>Sakit</option>
-                <option value="sakit" <?php echo ($presensi->STATUS == 'alfa') ? 'selected' : '';?>>Alfa</option>
+                <option value="sakit" <?php echo ($presensi->STATUS == 'alfa') ? 'selected' : '';?>>Alpha</option>
             </select>
         </div>
     </div>
