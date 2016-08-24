@@ -32,6 +32,6 @@
     </div>
     <div class="form-group well">
         <button class="btn btn-primary"><i class="glyphicon glyphicon-hdd"></i> Simpan</button>
-        <a href="<?php echo site_url('dashboard');?>" class="btn btn-default">Kembali</a>
+        <a href="<?php echo site_url('dashboard/working_days_list');?>" class="btn btn-default">Kembali</a>
     </div>
 </form>

@@ -22,7 +22,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <span class="glyphicon glyphicon-tags"></span> <a href="<?php echo site_url('dashboard/working_days');?>"> Input hari kerja</a>
+                                                    <span class="glyphicon glyphicon-tags"></span> <a href="<?php echo site_url('dashboard/working_days_list');?>"> Input hari kerja</a>
                                                 </td>
                                             </tr>
                                         </table>

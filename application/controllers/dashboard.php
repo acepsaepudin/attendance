@@ -109,4 +109,12 @@ class Dashboard extends CI_Controller{
             
         }
     }
+    public function working_days_list()
+    {
+        $this->load->model('workingdays_model');
+        $data['title'] = 'List Working days';
+        $data['working_days'] = $this->workingdays_model->get_all()->result();
+        $data['message'] ='';
+        $this->template->display('dashboard/working_days_list',$data);
+    }
 }
